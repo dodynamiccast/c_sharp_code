@@ -7,6 +7,8 @@ using System.Net;
 using System.IO;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System.Threading;
+using System.ComponentModel;
 /*
 $arguments = array(
 'Action' => $name,
@@ -29,23 +31,33 @@ $arguments = array(
 */
 namespace VodUpload
 {
-    class MultiPartUpload
+    public class MultiPartUpload
     {
         private string m_strSecId;
         private string m_strSecKey;
         private string m_strReqHost;
         private string m_strReqPath;
- //       private string m_strFilePath;
- //       private string m_strFileName;
+        private string m_strFilePath;
+        private string m_strFileName;
         private string m_strFileType;
-        private ulong m_qwDataSize;
+        private long m_qwDataSize;
         private int m_iIsTranscoed;
         private int m_iIsScreenShort;
         private int m_iIsWaterMark;
-        private ulong m_qwFileSize;
+        private long m_qwFileSize;
         private string m_strNotifyUrl;
         private string m_strFileSha;
+        public string FileSha
+        {
+            get { return m_strFileSha; }
+        }
         private string m_strReqUrl;
+        private string m_strFileId;
+        public string FileId
+        {
+            get { return m_strFileId; }
+        }
+
         private Dictionary<string, string> m_mapPara = new Dictionary<string, string>();
         private int m_iHttpTimeOut = 200 * 1000;
 
@@ -56,26 +68,75 @@ namespace VodUpload
         private const int MAX_DATA_SIZE = 5 * 1024 * 1024;
         private const int HTTP_TIME_OUT = -1;
         private const int HTTP_CLIENT_ERROR = -2;
+        private int m_id;
+        private int m_errCode;
+        private string m_strErrString;
+        private int m_iIsFinished;
+
+        public int IsFinished
+        {
+            get { return m_iIsFinished; }
+        }
+
+        private float m_fUploadRate;
+        private float m_fUploadSpeed;
+        private float m_fCalShaRate;
+
+        public float UploadRate
+        {
+            get { return m_fUploadRate; }
+            set
+            {
+                ;
+            }
+        }
+        public float UploadSpeed
+        {
+            get { return m_fUploadSpeed; }
+            set
+            {
+                ;
+            }
+        }
+
+        public float CalShaRate
+        {
+            get { return m_fCalShaRate; }
+            set {; }
+        }
 
         public MultiPartUpload()
         {
             m_iIsTranscoed = 0;
             m_iIsScreenShort = 0;
             m_strRegion = "sz";
-            m_qwDataSize = MIN_DATA_SIZE;
+            m_qwDataSize = MIN_DATA_SIZE*2;
             SetScreenShort(0);
             SetTranscode(0);
             SetWatermark(0);
             m_strReqHost = "vod.qcloud.com";
             m_strReqPath = "/v2/index.php";
             SetNotifyUrl("");
+            m_strFileSha = "计算中";
+            m_iIsFinished = 0;
         }
-        public static string GetTimeStamp()
+        public int SetFileInfo(string strFilePath, string fileName)
+        {
+            if (!System.IO.File.Exists(strFilePath))
+            {
+                Console.Write("no such file");
+                return -1;
+            }
+            m_strFileName = fileName;
+            m_strFilePath = strFilePath;
+            return 0;
+        }
+        public static Int64 GetTimeStamp()
         {
             TimeSpan ts = DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0, 0);
-            return Convert.ToInt64(ts.TotalSeconds).ToString();
+            return Convert.ToInt64(ts.TotalSeconds);
         }
-        public int SetDataSize(ulong dwDataSize)
+        public int SetDataSize(long dwDataSize)
         {
             if (dwDataSize > MIN_DATA_SIZE && dwDataSize < MAX_DATA_SIZE)
                 m_qwDataSize = dwDataSize;
@@ -120,6 +181,13 @@ namespace VodUpload
             m_mapPara["notifyUrl"] = url;
             return 0;
         }
+        public void Upload()
+        {
+            UInt64 qwFileId = 0;
+            UploadFile(m_strFilePath, m_strFileName, ref qwFileId);
+            m_strFileId = qwFileId.ToString();
+            m_iIsFinished = 1;
+        }
         public int UploadFile(string strFilePath, string strFileName, ref UInt64 qwFileId)
         {
             if (!System.IO.File.Exists(strFilePath))
@@ -132,14 +200,17 @@ namespace VodUpload
             m_strFileType = arrSplit.Last();
             m_mapPara["fileType"] = m_strFileType;
             m_mapPara["fileName"] = strFileName;
+            m_qwFileSize = m_fileReader.Length;
             m_mapPara["fileSize"] = m_fileReader.Length.ToString();
             m_strFileSha = CalFileSha();
             m_mapPara["fileSha"] = m_strFileSha;
             byte[] byteBuf = new byte[m_qwDataSize];
 
+            Int64 time_start = GetTimeStamp();
             long offset = 0;
+            long sendSize = 0;
             int iReadLen = 0;
-            ulong uMaxRetry = m_qwFileSize/m_qwDataSize + 3;
+            long uMaxRetry = m_qwFileSize/m_qwDataSize + 3;
             while (true)
             {
                 m_fileReader.Seek(offset, SeekOrigin.Begin);
@@ -148,14 +219,28 @@ namespace VodUpload
                 {
                     break;
                 }
-                m_mapPara["Timestamp"] = GetTimeStamp();
+                Int64 time_now = GetTimeStamp();
+                if (time_now > time_start)
+                {
+                    m_fUploadSpeed = sendSize / (time_now - time_start);
+                }
+                m_fUploadRate = ((float)offset / (float)m_qwFileSize * (float)100.0);
+
+                m_mapPara["Timestamp"] = time_now.ToString();
                 m_mapPara["Nonce"] = m_rand.Next(0, 1000000).ToString();
                 m_mapPara["dataSize"] = iReadLen.ToString();
                 m_mapPara["offset"] = offset.ToString();
                 m_mapPara["Signature"] = GetReqSign();
+
+                //test code
+                offset += iReadLen;
+                sendSize += iReadLen;
+                Thread.Sleep(1000);
+                continue;
+                /*
                 JObject jo = new JObject();
                 int ret = SendData(byteBuf, iReadLen,ref jo);
-           
+                sendSize += iReadLen;
                 if (ret == HTTP_TIME_OUT && uMaxRetry > 0)
                 {
                     uMaxRetry--;
@@ -200,7 +285,7 @@ namespace VodUpload
                         return -3;
                     offset = offset_ret;
                     continue;
-                }
+                }*/
             }
             Console.Write("error happened");
             return -1;
@@ -338,6 +423,5 @@ namespace VodUpload
             strContex += m_mapPara[arrKeys[arrKeys.Count() - 1]];
             return hash_hmac(strContex, m_strSecKey);
         }
-
     }
 }
