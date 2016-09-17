@@ -344,6 +344,7 @@ namespace VodUpload
                 ret == 24967 ||
                 ret == 28993 ||
                 ret == 24982 ||
+                ret == 24977 ||
                 ret == 10000)
                 return 1;
             return 0;
