@@ -33,6 +33,10 @@ namespace VodUpload
 {
     public class MultiPartUpload
     {
+        public const int FILE_WAIT = 0;
+        public const int FILE_FINISH = 1;
+        public const int FILE_RUNNING = 2;
+        public const int FILE_SVR_ERROR = 3;
         private string m_strSecId;
         private string m_strSecKey;
         private string m_strReqHost;
@@ -53,13 +57,13 @@ namespace VodUpload
         }
         private string m_strReqUrl;
         private string m_strFileId;
+
         public string FileId
         {
             get { return m_strFileId; }
         }
-
         private Dictionary<string, string> m_mapPara = new Dictionary<string, string>();
-        private int m_iHttpTimeOut = 200 * 1000;
+        private int m_iHttpTimeOut = 20 * 1000;
 
         private Random m_rand;
         private string m_strRegion;
@@ -68,14 +72,22 @@ namespace VodUpload
         private const int MAX_DATA_SIZE = 5 * 1024 * 1024;
         private const int HTTP_TIME_OUT = -1;
         private const int HTTP_CLIENT_ERROR = -2;
-        private int m_id;
-        private int m_errCode;
-        private string m_strErrString;
-        private int m_iIsFinished;
-
-        public int IsFinished
+        private long m_iErrCode;
+        public long ErrCode
         {
-            get { return m_iIsFinished; }
+            get { return m_iErrCode; }
+        }
+
+        private int m_iStatus;
+        public int Status
+        {
+            get { return m_iStatus; }
+        }
+
+        private string m_strErrDesc;
+        public string ErrDesc
+        {
+            get { return m_strErrDesc; }
         }
 
         private float m_fUploadRate;
@@ -85,24 +97,15 @@ namespace VodUpload
         public float UploadRate
         {
             get { return m_fUploadRate; }
-            set
-            {
-                ;
-            }
         }
         public float UploadSpeed
         {
             get { return m_fUploadSpeed; }
-            set
-            {
-                ;
-            }
         }
 
         public float CalShaRate
         {
             get { return m_fCalShaRate; }
-            set {; }
         }
 
         public MultiPartUpload()
@@ -110,15 +113,16 @@ namespace VodUpload
             m_iIsTranscoed = 0;
             m_iIsScreenShort = 0;
             m_strRegion = "sz";
-            m_qwDataSize = MIN_DATA_SIZE*2;
+            m_qwDataSize = MIN_DATA_SIZE;
             SetScreenShort(0);
             SetTranscode(0);
             SetWatermark(0);
             m_strReqHost = "vod.qcloud.com";
             m_strReqPath = "/v2/index.php";
             SetNotifyUrl("");
-            m_strFileSha = "计算中";
-            m_iIsFinished = 0;
+            m_strFileSha = "calculating......";
+            m_iStatus = 0;
+            m_strErrDesc = "success";
         }
         public int SetFileInfo(string strFilePath, string fileName)
         {
@@ -183,12 +187,10 @@ namespace VodUpload
         }
         public void Upload()
         {
-            UInt64 qwFileId = 0;
-            UploadFile(m_strFilePath, m_strFileName, ref qwFileId);
-            m_strFileId = qwFileId.ToString();
-            m_iIsFinished = 1;
+            m_iStatus = FILE_RUNNING;
+            UploadFile(m_strFilePath, m_strFileName, ref m_strFileId);
         }
-        public int UploadFile(string strFilePath, string strFileName, ref UInt64 qwFileId)
+        public int UploadFile(string strFilePath, string strFileName, ref string strFileId)
         {
             if (!System.IO.File.Exists(strFilePath))
             {
@@ -224,7 +226,7 @@ namespace VodUpload
                 {
                     m_fUploadSpeed = sendSize / (time_now - time_start);
                 }
-                m_fUploadRate = ((float)offset / (float)m_qwFileSize * (float)100.0);
+                m_fUploadRate = (float)offset / (float)m_qwFileSize;
 
                 m_mapPara["Timestamp"] = time_now.ToString();
                 m_mapPara["Nonce"] = m_rand.Next(0, 1000000).ToString();
@@ -232,12 +234,14 @@ namespace VodUpload
                 m_mapPara["offset"] = offset.ToString();
                 m_mapPara["Signature"] = GetReqSign();
 
+                /*
                 //test code
                 offset += iReadLen;
                 sendSize += iReadLen;
                 Thread.Sleep(1000);
-                continue;
-                /*
+                m_iStatus = FILE_RUNNING;
+                continue;*/
+                
                 JObject jo = new JObject();
                 int ret = SendData(byteBuf, iReadLen,ref jo);
                 sendSize += iReadLen;
@@ -248,6 +252,8 @@ namespace VodUpload
                 }
                 else if (ret < 0)
                 {
+                    m_strErrDesc = "svr error" + ret.ToString();
+                    m_iStatus = FILE_SVR_ERROR;
                     return -1;
                 }
 
@@ -260,33 +266,56 @@ namespace VodUpload
                 long code = 0;
                 if (GetIntValue(jo, "code", ref code) != 0)
                 {
+                    m_strErrDesc = "get svr ret code error";
+                    m_iStatus = FILE_SVR_ERROR;
                     return -1001;
                 }
+                m_iErrCode = code;
                 if (IsTimeoutRet(code) == 1)
                 {
                     offset = 0;
                     uMaxRetry--;
                     continue;
                 }
+                else if (code != 0)
+                {
+                    m_strErrDesc = "server code err " + code.ToString();
+                    m_iStatus = FILE_SVR_ERROR;
+                    return -1;
+                }
                 if (GetIntValue(jo, "flag", ref flag) != 0)
                 {
+                    m_strErrDesc = "get svr flag error";
+                    m_iStatus = FILE_SVR_ERROR;
                     return -2;
                 }
                 if (flag == 1 && code == 0)
                 {
-                    if (GetUIntValue(jo, "fileId", ref qwFileId) != 0)
+                    if (GetStringValue(jo, "fileId", ref strFileId) != 0)
+                    {
+                        m_strErrDesc = "get fileid failed";
+                        m_iStatus = FILE_SVR_ERROR;
                         return -1;
+                    }
+                    m_fUploadRate = (float)1.0;
+                    m_iStatus = FILE_FINISH;
                     return 0;
                 }
                 if (flag == 0 && code == 0)
                 {
                     long offset_ret = 0;
                     if (GetIntValue(jo, "offset", ref offset_ret) != 0)
+                    {
+                        m_strErrDesc = "get offset failed";
+                        m_iStatus = FILE_SVR_ERROR;
                         return -3;
+                    }
                     offset = offset_ret;
                     continue;
-                }*/
+                }
             }
+            m_strErrDesc = "finish upload failed";
+            m_iStatus = FILE_SVR_ERROR;
             Console.Write("error happened");
             return -1;
         }
@@ -303,6 +332,7 @@ namespace VodUpload
                 ret == 24971 ||
                 ret == 24977 ||
                 ret == 24967 ||
+                ret == 28993 ||
                 ret == 10000)
                 return 1;
             return 0;
@@ -359,12 +389,10 @@ namespace VodUpload
             request.ContentType = "application/x-www-form-urlencoded";
             request.ContentLength = size;
             request.Timeout = m_iHttpTimeOut;
-
-            Stream reqStream = request.GetRequestStream();
-            reqStream.Write(byteBuf, 0, size);
-
             try
             {
+                Stream reqStream = request.GetRequestStream();
+                reqStream.Write(byteBuf, 0, size);
                 HttpWebResponse response = (HttpWebResponse)request.GetResponse();
                 Stream myResponseStream = response.GetResponseStream();
                 StreamReader myStreamReader = new StreamReader(myResponseStream, Encoding.GetEncoding("utf-8"));

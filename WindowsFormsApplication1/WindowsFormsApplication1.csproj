@@ -7,8 +7,8 @@
     <ProjectGuid>{20FF6911-423D-4003-A630-DFA3E6B7CB32}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>WindowsFormsApplication1</RootNamespace>
-    <AssemblyName>WindowsFormsApplication1</AssemblyName>
+    <RootNamespace>VodUpload</RootNamespace>
+    <AssemblyName>VodUpload</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -33,6 +33,10 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject>
+    </StartupObject>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.9.0.1\lib\net40\Newtonsoft.Json.dll</HintPath>
@@ -42,6 +46,10 @@
     <Reference Include="PresentationFramework" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Data.SQLite, Version=1.0.103.0, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>C:\Program Files\System.Data.SQLite\2010\bin\System.Data.SQLite.dll</HintPath>
+    </Reference>
     <Reference Include="System.Xaml" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -57,23 +65,63 @@
     <Reference Include="WindowsFormsIntegration" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Form1.cs">
+    <Compile Include="DbManager.cs" />
+    <Compile Include="Form_AddUser.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Form1.Designer.cs">
-      <DependentUpon>Form1.cs</DependentUpon>
+    <Compile Include="Form_AddUser.Designer.cs">
+      <DependentUpon>Form_AddUser.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Form_FileInfo.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form_FileInfo.Designer.cs">
+      <DependentUpon>Form_FileInfo.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Form_Main.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form_Main.Designer.cs">
+      <DependentUpon>Form_Main.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Form_UserManager.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form_UserManager.Designer.cs">
+      <DependentUpon>Form_UserManager.cs</DependentUpon>
     </Compile>
     <Compile Include="MultiPartUpload.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="UserControl_FileInfo.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="UserControl_FileInfo.Designer.cs">
+      <DependentUpon>UserControl_FileInfo.cs</DependentUpon>
+    </Compile>
     <Compile Include="UserControl_upload_ex.cs">
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="UserControl_upload_ex.Designer.cs">
       <DependentUpon>UserControl_upload_ex.cs</DependentUpon>
     </Compile>
-    <EmbeddedResource Include="Form1.resx">
-      <DependentUpon>Form1.cs</DependentUpon>
+    <Compile Include="UserControl_UserItem.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="UserControl_UserItem.Designer.cs">
+      <DependentUpon>UserControl_UserItem.cs</DependentUpon>
+    </Compile>
+    <EmbeddedResource Include="Form_AddUser.resx">
+      <DependentUpon>Form_AddUser.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form_FileInfo.resx">
+      <DependentUpon>Form_FileInfo.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form_Main.resx">
+      <DependentUpon>Form_Main.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form_UserManager.resx">
+      <DependentUpon>Form_UserManager.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -85,8 +133,14 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
+    <EmbeddedResource Include="UserControl_FileInfo.resx">
+      <DependentUpon>UserControl_FileInfo.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="UserControl_upload_ex.resx">
       <DependentUpon>UserControl_upload_ex.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UserControl_UserItem.resx">
+      <DependentUpon>UserControl_UserItem.cs</DependentUpon>
     </EmbeddedResource>
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
@@ -101,6 +155,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Service References\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

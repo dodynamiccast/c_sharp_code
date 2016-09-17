@@ -32,9 +32,9 @@
             this.textBox_path = new System.Windows.Forms.TextBox();
             this.textBox_rate = new System.Windows.Forms.TextBox();
             this.textBox_speed = new System.Windows.Forms.TextBox();
-            this.button1 = new System.Windows.Forms.Button();
             this.textBox_fileId = new System.Windows.Forms.TextBox();
             this.textBox_sha = new System.Windows.Forms.TextBox();
+            this.label_status = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // textBox_name
@@ -69,15 +69,6 @@
             this.textBox_speed.Size = new System.Drawing.Size(41, 21);
             this.textBox_speed.TabIndex = 3;
             // 
-            // button1
-            // 
-            this.button1.Location = new System.Drawing.Point(767, 1);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(69, 23);
-            this.button1.TabIndex = 4;
-            this.button1.Text = "button1";
-            this.button1.UseVisualStyleBackColor = true;
-            // 
             // textBox_fileId
             // 
             this.textBox_fileId.Cursor = System.Windows.Forms.Cursors.No;
@@ -94,19 +85,28 @@
             this.textBox_sha.Size = new System.Drawing.Size(256, 21);
             this.textBox_sha.TabIndex = 6;
             // 
+            // label_status
+            // 
+            this.label_status.AutoSize = true;
+            this.label_status.Location = new System.Drawing.Point(780, 7);
+            this.label_status.Name = "label_status";
+            this.label_status.Size = new System.Drawing.Size(41, 12);
+            this.label_status.TabIndex = 7;
+            this.label_status.Text = "label1";
+            // 
             // UserControl_upload_ex
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this.label_status);
             this.Controls.Add(this.textBox_sha);
             this.Controls.Add(this.textBox_fileId);
-            this.Controls.Add(this.button1);
             this.Controls.Add(this.textBox_speed);
             this.Controls.Add(this.textBox_rate);
             this.Controls.Add(this.textBox_path);
             this.Controls.Add(this.textBox_name);
             this.Name = "UserControl_upload_ex";
-            this.Size = new System.Drawing.Size(839, 27);
+            this.Size = new System.Drawing.Size(864, 27);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -118,8 +118,8 @@
         private System.Windows.Forms.TextBox textBox_path;
         private System.Windows.Forms.TextBox textBox_rate;
         private System.Windows.Forms.TextBox textBox_speed;
-        private System.Windows.Forms.Button button1;
         private System.Windows.Forms.TextBox textBox_fileId;
         private System.Windows.Forms.TextBox textBox_sha;
+        private System.Windows.Forms.Label label_status;
     }
 }

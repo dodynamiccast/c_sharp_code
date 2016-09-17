@@ -15,10 +15,26 @@ namespace WindowsFormsApplication1
     {
         private MultiPartUpload m_upload;
         Thread m_uploadThread;
+        long m_qwId;
+        private DbManager m_dbManager;
+        public int Status
+        {
+            get { return m_upload.Status; }
+        }
+        public int SetDbManager(DbManager dbManager)
+        {
+            m_dbManager = dbManager;
+            return 0;
+        }
+        public long ID
+        {
+            get { return m_qwId; }
+            set { m_qwId = value; }
+        } 
         public UserControl_upload_ex()
         {
-            m_upload = new MultiPartUpload();
             InitializeComponent();
+            m_upload = new MultiPartUpload();
         }
         public int Init(string strSecId, string strSecKey)
         {
@@ -33,8 +49,10 @@ namespace WindowsFormsApplication1
             textBox_path.Text = strFilePath;
             textBox_rate.Text = "0";
             textBox_speed.Text = "0";
+            label_status.Text = "运行中";
             return 0;
         }
+       
         public void Upload()
         {
             ThreadStart threadStart = new ThreadStart(m_upload.Upload);
@@ -43,13 +61,23 @@ namespace WindowsFormsApplication1
         }
         public int Refresh_Upload()
         {
-            textBox_rate.Text = m_upload.UploadRate.ToString();
-            textBox_speed.Text = m_upload.UploadSpeed.ToString();
+            textBox_rate.Text = Math.Floor((m_upload.UploadRate)*100.0).ToString() + "%";
+            textBox_speed.Text = Math.Floor((m_upload.UploadSpeed/1000.0)).ToString() + "KB/s";
             textBox_sha.Text = m_upload.FileSha;
-            if (m_upload.IsFinished == 1)
+            m_dbManager.UpdateFileInfo(m_qwId, m_upload.FileId, m_upload.FileSha, 
+                            m_upload.Status, m_upload.ErrCode, m_upload.ErrDesc);
+            if (m_upload.Status == MultiPartUpload.FILE_FINISH)
             {
                 textBox_fileId.Text = m_upload.FileId;
+                label_status.Text = "完成";
+                return 1;
             }
+            if (m_upload.Status == MultiPartUpload.FILE_SVR_ERROR)
+            {
+                label_status.Text = "出错";
+                return -1;
+            }
+            label_status.Text = "运行中";
             return 0;
         }
         public int StopThread()
