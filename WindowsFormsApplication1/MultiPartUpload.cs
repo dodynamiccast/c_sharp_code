@@ -63,7 +63,7 @@ namespace VodUpload
             get { return m_strFileId; }
         }
         private Dictionary<string, string> m_mapPara = new Dictionary<string, string>();
-        private int m_iHttpTimeOut = 20 * 1000;
+        private int m_iHttpTimeOut = 30 * 1000;
 
         private Random m_rand;
         private string m_strRegion;
@@ -190,6 +190,16 @@ namespace VodUpload
             m_iStatus = FILE_RUNNING;
             UploadFile(m_strFilePath, m_strFileName, ref m_strFileId);
         }
+        public void RefreshNetCtrl()
+        {
+            if ((long)(m_fUploadSpeed * m_iHttpTimeOut/5) >= MIN_DATA_SIZE)
+            {
+                if ((long)(m_fUploadSpeed * m_iHttpTimeOut / 5) < MAX_DATA_SIZE)
+                    m_qwDataSize = (long)(m_fUploadSpeed * m_iHttpTimeOut / 5);
+                else
+                    m_qwDataSize = MAX_DATA_SIZE;
+            }
+        }
         public int UploadFile(string strFilePath, string strFileName, ref string strFileId)
         {
             if (!System.IO.File.Exists(strFilePath))
@@ -245,7 +255,7 @@ namespace VodUpload
                 JObject jo = new JObject();
                 int ret = SendData(byteBuf, iReadLen,ref jo);
                 sendSize += iReadLen;
-                if (ret == HTTP_TIME_OUT && uMaxRetry > 0)
+                if (ret == HTTP_TIME_OUT || ret == HTTP_CLIENT_ERROR && uMaxRetry > 0)
                 {
                     uMaxRetry--;
                     continue;
@@ -333,6 +343,7 @@ namespace VodUpload
                 ret == 24977 ||
                 ret == 24967 ||
                 ret == 28993 ||
+                ret == 24982 ||
                 ret == 10000)
                 return 1;
             return 0;
