@@ -33,8 +33,24 @@ namespace VodUpload
             UInt64 qwAppId = 0;
             try
             {
+                int isTranscode  = 0;
+                int isScreenshort = 0;
+                int isWartermark = 0;
                 qwAppId = UInt64.Parse(textBox_appid.Text);
-                m_dbManager.AddUsr(qwAppId, textBox_secId.Text, textBox_secKey.Text, ref m_qwUserId);
+                if (checkBox_isTranscode.Checked)
+                    isTranscode = 1;
+                if (checkBox_isScreenshort.Checked)
+                    isScreenshort = 1;
+                if (checkBox_isWartermark.Checked)
+                    isWartermark = 1;
+                m_dbManager.AddUsr(qwAppId, 
+                    textBox_secId.Text, 
+                    textBox_secKey.Text, 
+                    isTranscode,
+                    isScreenshort,
+                    isWartermark,
+                    textBox_notifyUrl.Text,
+                    ref m_qwUserId);
             }
             catch (Exception ex)
             {

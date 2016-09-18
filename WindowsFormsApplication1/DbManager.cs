@@ -31,13 +31,21 @@ namespace VodUpload
         }
         public int GetUser(ref List<Dictionary<string, string>> arrUser, int status=-1)
         {
-            string[] arrPara = { "id", "appid", "secKey", "secId", "status", "update_time" };
+            string[] arrPara = { "id", "appid", "secKey", "secId",
+                "status", "update_time","isScreenshort", "isTranscode",
+                "isWatermark","notifyUrl" };
             SQLiteCommand cmd = new SQLiteCommand(m_sqlConn);
             if (status == -1)
-                cmd.CommandText = "select id,appid,secKey,secId,status,update_time from UserCfg order by status desc,update_time desc";
+            {
+                cmd.CommandText = "select id,appid,secKey,secId,status,update_time," +
+                    "isTranscode,isScreenshort,isWatermark,notifyUrl " +
+                    "from UserCfg order by status desc,update_time desc";
+            }
             else
             {
-                cmd.CommandText = "select id,appid,secKey,secId,status,update_time from UserCfg where status=@status order by status desc,update_time desc";
+                cmd.CommandText = "select id,appid,secKey,secId,status,update_time," +
+                    "isTranscode,isScreenshort,isWatermark,notifyUrl " +
+                    "from UserCfg where status=@status order by status desc,update_time desc";
                 cmd.Parameters.Add(new SQLiteParameter("@status", status));
             }
             SQLiteDataReader data = cmd.ExecuteReader(System.Data.CommandBehavior.SingleResult);
@@ -74,17 +82,32 @@ namespace VodUpload
             int ret = cmd.ExecuteNonQuery();
             return 0;
         }
-        public int AddFile(UInt64 qwAppid, string strPath, string strName, int status,int errCode, ref long fileId)
+        public int AddFile(UInt64 qwAppid, 
+                           string strPath, 
+                           string strName, 
+                           int status,
+                           int errCode,
+                           int isTranscode,
+                           int isScreenshort,
+                           int isWatermark, 
+                           string notifyUrl,
+                           ref long fileId)
         {
             SQLiteCommand cmd = new SQLiteCommand(m_sqlConn);
-            cmd.CommandText = "insert into File (appid, status, errCode, update_time,filePath,fileName)" +
-                "values(@appid, @status, @errCode, strftime('%s', 'now'), @filePath, @fileName);"+
+            cmd.CommandText = "insert into File (appid, status, errCode, "+
+                "update_time,filePath,fileName,isTranscode,isScreenshort,isWatermark,notifyUrl)" +
+                "values(@appid, @status, @errCode, strftime('%s', 'now'), @filePath, @fileName," +
+                "@isTranscode,@isScreenshort,@isWatermark,@notifyUrl);" +
                 "SELECT seq from SQLITE_SEQUENCE where name=\"File\";";
             cmd.Parameters.Add(new SQLiteParameter("@appid", qwAppid));
             cmd.Parameters.Add(new SQLiteParameter("@status", status));
             cmd.Parameters.Add(new SQLiteParameter("@errCode", errCode));
             cmd.Parameters.Add(new SQLiteParameter("@filePath", strPath));
             cmd.Parameters.Add(new SQLiteParameter("@fileName", strName));
+            cmd.Parameters.Add(new SQLiteParameter("@isTranscode", isTranscode));
+            cmd.Parameters.Add(new SQLiteParameter("@isScreenshort", isScreenshort));
+            cmd.Parameters.Add(new SQLiteParameter("@isWatermark", isWatermark));
+            cmd.Parameters.Add(new SQLiteParameter("@notifyUrl", notifyUrl));
             SQLiteDataReader data = cmd.ExecuteReader(System.Data.CommandBehavior.SingleResult);
             if (data.Read())
             {
@@ -118,9 +141,12 @@ namespace VodUpload
         public int GetFileInfo(UInt64 qwAppid, ref List<Dictionary<string, string>> arrFile, int status=-1)
         {
             string[] arrPara = { "id", "appid", "errCode",
-                "filePath", "fileName", "status", "fileId", "errDesc","fileSha" };
+                "filePath", "fileName", "status", "fileId", "errDesc","fileSha",
+                "isScreenshort", "isTranscode", "isWatermark","notifyUrl"};
             SQLiteCommand cmd = new SQLiteCommand(m_sqlConn);
-            string cmdText = "select id,appid,errCode,filePath,fileName,status,fileId,errDesc,fileSha from file where appid=@appid";
+            string cmdText = "select id,appid,errCode,filePath,fileName,status,fileId,errDesc,fileSha,"+
+                "isTranscode,isScreenshort,isWatermark,notifyUrl " +
+                "from file where appid=@appid";
             if (status != -1)
             {
                 cmdText += " and status = @status";
@@ -142,16 +168,29 @@ namespace VodUpload
             }
             return 0;
         }
-        public int AddUsr(UInt64 qwAppid, string strSecId, string strSecKey, ref Int64 user_id)
+        public int AddUsr(UInt64 qwAppid, 
+                          string strSecId, 
+                          string strSecKey,
+                          int isTranscode,
+                          int isScreenshort,
+                          int isWatermark,
+                          string notifyUrl,
+                          ref Int64 user_id)
         {
             SQLiteCommand cmd = new SQLiteCommand(m_sqlConn);
-            string cmdText = "insert into UserCfg (appid, secKey, secId, status, update_time)"+
-                "values(@appid, @secKey, @secId, 1, strftime('%s', 'now'));"+
+            string cmdText = "insert into UserCfg (appid, secKey, secId, status, update_time,"+
+                "isTranscode,isScreenshort,isWatermark,notifyUrl)" +
+                "values(@appid, @secKey, @secId, 1, strftime('%s', 'now'),"+
+                "@isTranscode,@isScreenshort,@isWatermark,@notifyUrl);" +
                 "SELECT seq from SQLITE_SEQUENCE  where name=\"UserCfg\";";
             long time_stamp = MultiPartUpload.GetTimeStamp();
             cmd.Parameters.Add(new SQLiteParameter("@appid", qwAppid));
             cmd.Parameters.Add(new SQLiteParameter("@secKey", strSecKey));
             cmd.Parameters.Add(new SQLiteParameter("@secId", strSecId));
+            cmd.Parameters.Add(new SQLiteParameter("@isTranscode", isTranscode));
+            cmd.Parameters.Add(new SQLiteParameter("@isScreenshort", isScreenshort));
+            cmd.Parameters.Add(new SQLiteParameter("@isWatermark", isWatermark));
+            cmd.Parameters.Add(new SQLiteParameter("@notifyUrl", notifyUrl));
             cmd.CommandText = cmdText;
             try
             {

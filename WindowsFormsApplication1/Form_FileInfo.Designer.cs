@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form_FileInfo));
             this.comboBox_status = new System.Windows.Forms.ComboBox();
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
@@ -92,6 +93,7 @@
             this.Controls.Add(this.comboBox_page);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.comboBox_status);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "Form_FileInfo";
             this.Text = "Form_FileInfo";
             this.ResumeLayout(false);

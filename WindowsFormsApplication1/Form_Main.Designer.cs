@@ -29,6 +29,7 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form_Main));
             this.textBox_filePath = new System.Windows.Forms.TextBox();
             this.but_test = new System.Windows.Forms.Button();
             this.timer_listen = new System.Windows.Forms.Timer(this.components);
@@ -47,6 +48,9 @@
             this.menuitem_fileInfo = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem_openManager = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip_User = new System.Windows.Forms.MenuStrip();
+            this.checkBox_isTranscode = new System.Windows.Forms.CheckBox();
+            this.checkBox_isScreenShort = new System.Windows.Forms.CheckBox();
+            this.checkBox_isWm = new System.Windows.Forms.CheckBox();
             this.panel1.SuspendLayout();
             this.panel2.SuspendLayout();
             this.menuStrip_User.SuspendLayout();
@@ -54,16 +58,16 @@
             // 
             // textBox_filePath
             // 
-            this.textBox_filePath.Location = new System.Drawing.Point(9, 5);
+            this.textBox_filePath.Location = new System.Drawing.Point(240, 5);
             this.textBox_filePath.Name = "textBox_filePath";
-            this.textBox_filePath.Size = new System.Drawing.Size(208, 21);
+            this.textBox_filePath.Size = new System.Drawing.Size(118, 21);
             this.textBox_filePath.TabIndex = 0;
             // 
             // but_test
             // 
-            this.but_test.Location = new System.Drawing.Point(251, 3);
+            this.but_test.Location = new System.Drawing.Point(363, 3);
             this.but_test.Name = "but_test";
-            this.but_test.Size = new System.Drawing.Size(75, 23);
+            this.but_test.Size = new System.Drawing.Size(55, 23);
             this.but_test.TabIndex = 1;
             this.but_test.Text = "上传";
             this.but_test.UseVisualStyleBackColor = true;
@@ -85,19 +89,22 @@
             // 
             // panel1
             // 
+            this.panel1.Controls.Add(this.checkBox_isWm);
+            this.panel1.Controls.Add(this.checkBox_isScreenShort);
+            this.panel1.Controls.Add(this.checkBox_isTranscode);
             this.panel1.Controls.Add(this.button1);
             this.panel1.Controls.Add(this.textBox_filePath);
             this.panel1.Controls.Add(this.but_test);
             this.panel1.Location = new System.Drawing.Point(6, 56);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(448, 33);
+            this.panel1.Size = new System.Drawing.Size(535, 33);
             this.panel1.TabIndex = 6;
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(360, 3);
+            this.button1.Location = new System.Drawing.Point(421, 3);
             this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(75, 23);
+            this.button1.Size = new System.Drawing.Size(58, 23);
             this.button1.TabIndex = 2;
             this.button1.Text = "浏览";
             this.button1.UseVisualStyleBackColor = true;
@@ -111,12 +118,12 @@
             this.panel2.Controls.Add(this.label1);
             this.panel2.Location = new System.Drawing.Point(6, 26);
             this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(448, 26);
+            this.panel2.Size = new System.Drawing.Size(535, 26);
             this.panel2.TabIndex = 7;
             // 
             // textBox_secKey
             // 
-            this.textBox_secKey.Location = new System.Drawing.Point(269, 1);
+            this.textBox_secKey.Location = new System.Drawing.Point(272, 1);
             this.textBox_secKey.Name = "textBox_secKey";
             this.textBox_secKey.Size = new System.Drawing.Size(166, 21);
             this.textBox_secKey.TabIndex = 3;
@@ -166,14 +173,14 @@
             // menuitem_addUser
             // 
             this.menuitem_addUser.Name = "menuitem_addUser";
-            this.menuitem_addUser.Size = new System.Drawing.Size(152, 22);
+            this.menuitem_addUser.Size = new System.Drawing.Size(124, 22);
             this.menuitem_addUser.Text = "添加账户";
             this.menuitem_addUser.Click += new System.EventHandler(this.menuitem_addUser_Click);
             // 
             // menuitem_changeUser
             // 
             this.menuitem_changeUser.Name = "menuitem_changeUser";
-            this.menuitem_changeUser.Size = new System.Drawing.Size(152, 22);
+            this.menuitem_changeUser.Size = new System.Drawing.Size(124, 22);
             this.menuitem_changeUser.Text = "切换账户";
             this.menuitem_changeUser.Click += new System.EventHandler(this.menuitem_changeUser_Click);
             // 
@@ -188,7 +195,7 @@
             // toolStripMenuItem_openManager
             // 
             this.toolStripMenuItem_openManager.Name = "toolStripMenuItem_openManager";
-            this.toolStripMenuItem_openManager.Size = new System.Drawing.Size(152, 22);
+            this.toolStripMenuItem_openManager.Size = new System.Drawing.Size(124, 22);
             this.toolStripMenuItem_openManager.Text = "打开窗口";
             this.toolStripMenuItem_openManager.Click += new System.EventHandler(this.toolStripMenuItem_openManager_Click);
             // 
@@ -200,9 +207,41 @@
             this.menuitem_fileInfo});
             this.menuStrip_User.Location = new System.Drawing.Point(0, 0);
             this.menuStrip_User.Name = "menuStrip_User";
-            this.menuStrip_User.Size = new System.Drawing.Size(260, 25);
+            this.menuStrip_User.Size = new System.Drawing.Size(168, 25);
             this.menuStrip_User.TabIndex = 9;
             this.menuStrip_User.Text = "账户管理";
+            // 
+            // checkBox_isTranscode
+            // 
+            this.checkBox_isTranscode.AutoSize = true;
+            this.checkBox_isTranscode.Location = new System.Drawing.Point(4, 8);
+            this.checkBox_isTranscode.Name = "checkBox_isTranscode";
+            this.checkBox_isTranscode.Size = new System.Drawing.Size(72, 16);
+            this.checkBox_isTranscode.TabIndex = 3;
+            this.checkBox_isTranscode.Text = "是否转码";
+            this.checkBox_isTranscode.UseVisualStyleBackColor = true;
+            // 
+            // checkBox_isScreenShort
+            // 
+            this.checkBox_isScreenShort.AutoSize = true;
+            this.checkBox_isScreenShort.Location = new System.Drawing.Point(76, 8);
+            this.checkBox_isScreenShort.Name = "checkBox_isScreenShort";
+            this.checkBox_isScreenShort.Size = new System.Drawing.Size(72, 16);
+            this.checkBox_isScreenShort.TabIndex = 4;
+            this.checkBox_isScreenShort.Text = "是否截图";
+            this.checkBox_isScreenShort.UseVisualStyleBackColor = true;
+            this.checkBox_isScreenShort.CheckedChanged += new System.EventHandler(this.checkBox_isScreenShort_CheckedChanged);
+            // 
+            // checkBox_isWm
+            // 
+            this.checkBox_isWm.AutoSize = true;
+            this.checkBox_isWm.Location = new System.Drawing.Point(144, 8);
+            this.checkBox_isWm.Name = "checkBox_isWm";
+            this.checkBox_isWm.Size = new System.Drawing.Size(96, 16);
+            this.checkBox_isWm.TabIndex = 5;
+            this.checkBox_isWm.Text = "是否添加水印";
+            this.checkBox_isWm.UseVisualStyleBackColor = true;
+            this.checkBox_isWm.CheckedChanged += new System.EventHandler(this.checkBox_isWm_CheckedChanged);
             // 
             // Form_Main
             // 
@@ -214,6 +253,7 @@
             this.Controls.Add(this.panel1);
             this.Controls.Add(this.flowLayoutPanel_contain);
             this.Controls.Add(this.menuStrip_User);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MainMenuStrip = this.menuStrip_User;
             this.Name = "Form_Main";
             this.Text = "Upload";
@@ -249,6 +289,9 @@
         private System.Windows.Forms.ToolStripMenuItem menuitem_fileInfo;
         private System.Windows.Forms.MenuStrip menuStrip_User;
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem_openManager;
+        private System.Windows.Forms.CheckBox checkBox_isTranscode;
+        private System.Windows.Forms.CheckBox checkBox_isScreenShort;
+        private System.Windows.Forms.CheckBox checkBox_isWm;
     }
 }
 

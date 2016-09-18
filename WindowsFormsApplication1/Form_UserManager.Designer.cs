@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form_UserManager));
             this.button_front = new System.Windows.Forms.Button();
             this.label_pagenum = new System.Windows.Forms.Label();
             this.button_next = new System.Windows.Forms.Button();
@@ -77,6 +78,7 @@
             this.Controls.Add(this.button_next);
             this.Controls.Add(this.label_pagenum);
             this.Controls.Add(this.button_front);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "Form_UserManager";
             this.Text = "Form_UserManager";
             this.ResumeLayout(false);

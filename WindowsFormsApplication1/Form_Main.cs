@@ -22,7 +22,66 @@ namespace WindowsFormsApplication1
         string m_strAppId;
         string m_strSecId;
         string m_strSecKey;
-        public const int MAX_RUNNING_TASK = 10;
+        public const int MAX_RUNNING_TASK = 6;
+        string m_strNotifyUrl = "";
+        class TransPara{
+            private int isTranscode;
+            private int isScreenshort;
+            private int isWatermark;
+            private string notifyUrl;
+
+            public int IsTranscode
+            {
+                get
+                {
+                    return isTranscode;
+                }
+
+                set
+                {
+                    isTranscode = value;
+                }
+            }
+
+            public int IsScreenshort
+            {
+                get
+                {
+                    return isScreenshort;
+                }
+
+                set
+                {
+                    isScreenshort = value;
+                }
+            }
+
+            public int IsWatermark
+            {
+                get
+                {
+                    return isWatermark;
+                }
+
+                set
+                {
+                    isWatermark = value;
+                }
+            }
+
+            public string NotifyUrl
+            {
+                get
+                {
+                    return notifyUrl;
+                }
+
+                set
+                {
+                    notifyUrl = value;
+                }
+            }
+        };
         private int GetUser()
         {
             List<Dictionary<string, string>> arrUser = new List<Dictionary<string, string>>();
@@ -32,17 +91,52 @@ namespace WindowsFormsApplication1
                 textBox_secId.Text = arrUser[0]["secId"];
                 textBox_secKey.Text = arrUser[0]["secKey"];
                 m_strAppId = arrUser[0]["appid"];
+                if (arrUser[0]["isTranscode"] == "1")
+                {
+                    checkBox_isTranscode.Checked = true;
+                }
+                if (arrUser[0]["isScreenshort"] == "1")
+                {
+                    checkBox_isScreenShort.Checked = true;
+                }
+                if (arrUser[0]["isWatermark"] == "1")
+                {
+                    checkBox_isWm.Checked = true;
+                }
+                m_strNotifyUrl = arrUser[0]["notifyUrl"];
+            }
+            else
+            {
+                m_strAppId = "0";
             }
             return 0;
         }
-        private int GetFile()
+        private int GetDicIntVal(Dictionary<string, string> dic, string strKey)
+        {
+            int val = 0;
+            try
+            {
+                val = int.Parse(dic[strKey]);
+            }
+            catch
+            {
+                val = 0;
+            }
+            return val;
+        }
+        private int ReLoadFile()
         {
             List<Dictionary<string, string>> arrFile = new List<Dictionary<string, string>>();
             m_dbManager.GetFileInfo(ulong.Parse(m_strAppId), ref arrFile, MultiPartUpload.FILE_WAIT);
             m_dbManager.GetFileInfo(ulong.Parse(m_strAppId), ref arrFile, MultiPartUpload.FILE_RUNNING);
             foreach (Dictionary<string, string> file in arrFile)
             {
-                UploadFile(file["filePath"], file["fileName"], long.Parse(file["id"]));
+                TransPara para = new TransPara();
+                para.IsTranscode = GetDicIntVal(file, "isTranscode");
+                para.IsScreenshort = GetDicIntVal(file, "isScreenshort");
+                para.IsWatermark = GetDicIntVal(file, "isWatermark");
+                para.NotifyUrl = file["notifyUrl"];
+                UploadFile(file["filePath"], file["fileName"], para, long.Parse(file["id"]));
             }
             return 0;
         }
@@ -53,15 +147,23 @@ namespace WindowsFormsApplication1
             m_dbManager = new DbManager();
             m_dbManager.Init();
             GetUser();
-            GetFile();
+            checkBox_isTranscode.Checked = true;
+            checkBox_isScreenShort.Checked = true;
+
+            ReLoadFile();
         }
         ~Form_Main()
         {
 
         }
-        private int UploadFile(string strFilePath, string strFileName, long id=0)
+        private int UploadFile(string strFilePath, string strFileName, TransPara para, long id =0)
         {
             UserControl_upload_ex upload = new UserControl_upload_ex();
+            upload.SetScreenShot(para.IsScreenshort);
+            upload.SetTransCode(para.IsTranscode);
+            upload.SetWatermark(para.IsWatermark);
+            upload.SetNotifyUrl(para.NotifyUrl);
+
             //upload.Init("AKIDywHSpWDragT7ESvCtqUrEg8Weuz8ibWj", "wLuplid8L7LsgENlaB2FtyKgUaYsBuqR");
             upload.Init(textBox_secId.Text, textBox_secKey.Text);
             //upload.SetFileInfo("J:\\download\\太子妃升职记.全集.EP01-36.2015.HD1080P.X264.AAC.Mandarin.CHS.Mp4Ba\\太子妃升职记.EP01.2015.HD1080P.X264.AAC.Mandarin.CHS.mp4", "little_prince");
@@ -72,7 +174,16 @@ namespace WindowsFormsApplication1
             if (id == 0)
             {
                 long qwFileId = 0;
-                m_dbManager.AddFile(ulong.Parse(m_strAppId), strFilePath, strFileName, 0, 0, ref qwFileId);
+                m_dbManager.AddFile(ulong.Parse(m_strAppId), 
+                    strFilePath, 
+                    strFileName, 
+                    0, 
+                    0,
+                    para.IsTranscode,                   
+                    para.IsScreenshort,
+                    para.IsWatermark,
+                    para.NotifyUrl,
+                    ref qwFileId);
                 upload.ID = qwFileId;
             }
             else
@@ -83,9 +194,11 @@ namespace WindowsFormsApplication1
             m_arrUploadCtrl.Add(upload);
             flowLayoutPanel_contain.Controls.Add(upload);
             flowLayoutPanel_contain.Controls.SetChildIndex(upload, 0);
-            int num = m_dbManager.GetFileCount(ulong.Parse(m_strAppId));
+            int num = m_dbManager.GetFileCount(ulong.Parse(m_strAppId), MultiPartUpload.FILE_RUNNING);
             if (num < MAX_RUNNING_TASK)
+            {
                 upload.Upload();
+            }
             return 0;
         }
         private void but_test_Click(object sender, EventArgs e)
@@ -113,7 +226,16 @@ namespace WindowsFormsApplication1
                 MessageBox.Show("文件路径非法");
                 return;
             }
-            UploadFile(strFilePath, strFileName);
+
+            TransPara para = new TransPara();
+            if (checkBox_isTranscode.Checked)
+                para.IsTranscode = 1;
+            if (checkBox_isScreenShort.Checked)
+                para.IsScreenshort = 1;
+            if (checkBox_isWm.Checked)
+                para.IsWatermark = 1;
+            para.NotifyUrl = m_strNotifyUrl;
+            UploadFile(strFilePath, strFileName, para);
             //Thread.Sleep(5000);
             //m_upload.Test = "fuck";
             //m_upload.UploadSpeed = (float)0.23;
@@ -121,7 +243,7 @@ namespace WindowsFormsApplication1
         }
         private void TryWakeUp()
         {
-            int num = m_dbManager.GetFileCount(ulong.Parse(m_strAppId));
+            int num = m_dbManager.GetFileCount(ulong.Parse(m_strAppId), MultiPartUpload.FILE_RUNNING);
             if (num < MAX_RUNNING_TASK)
             {
                 foreach (UserControl_upload_ex upload_wake in m_arrUploadCtrl)
@@ -142,6 +264,7 @@ namespace WindowsFormsApplication1
                 {
                     continue;
                 }
+                TryWakeUp();
             }
         }
 
@@ -183,6 +306,22 @@ namespace WindowsFormsApplication1
             Form_FileInfo fFileInfo = new Form_FileInfo();
             fFileInfo.Init(m_dbManager, ulong.Parse(m_strAppId));
             fFileInfo.ShowDialog();
+        }
+
+        private void checkBox_isWm_CheckedChanged(object sender, EventArgs e)
+        {
+            if (checkBox_isWm.Checked)
+            {
+                checkBox_isTranscode.Checked = true;
+            }
+        }
+
+        private void checkBox_isScreenShort_CheckedChanged(object sender, EventArgs e)
+        {
+            if (checkBox_isScreenShort.Checked)
+            {
+                checkBox_isTranscode.Checked = true;
+            }
         }
     }
 }

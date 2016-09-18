@@ -274,6 +274,7 @@ namespace VodUpload
                 }
                 long flag = 0;
                 long code = 0;
+                
                 if (GetIntValue(jo, "code", ref code) != 0)
                 {
                     m_strErrDesc = "get svr ret code error";
@@ -332,52 +333,77 @@ namespace VodUpload
         //后台内部超时，可重试
         private int IsTimeoutRet(long ret)
         {
-            if (ret == 28996 ||
-                ret == 24983 ||
-                ret == 24987 ||
-                ret == 24991 ||
-                ret == 24995 ||
-                ret == 24998 ||
-                ret == 24979 ||
-                ret == 24971 ||
-                ret == 24977 ||
-                ret == 24967 ||
-                ret == 28993 ||
-                ret == 24982 ||
-                ret == 24977 ||
+            if (ret == -28997 ||
+                ret == -28996 ||
+                ret == -24983 ||
+                ret == -24987 ||
+                ret == -24991 ||
+                ret == -24995 ||
+                ret == -24998 ||
+                ret == -24979 ||
+                ret == -24971 ||
+                ret == -24977 ||
+                ret == -24967 ||
+                ret == -28993 ||
+                ret == -24982 ||
+                ret == -24977 ||
                 ret == 10000)
                 return 1;
             return 0;
         }
         private int GetIntValue(JObject jo, string strKey, ref long ret)
         {
-            if (jo[strKey].Type == JTokenType.Integer|| jo[strKey].Type==JTokenType.String)
+            try
             {
-                ret = Convert.ToInt64(jo[strKey].ToString());
-                return 0;
+                if (jo[strKey].Type == JTokenType.Integer || jo[strKey].Type == JTokenType.String)
+                {
+                    ret = Convert.ToInt64(jo[strKey].ToString());
+                    return 0;
+                }
+                else
+                    return -1;
             }
-            else 
+            catch (Exception e)
+            {
+                m_strErrDesc = e.ToString();
                 return -1;
+            }
         }
         private int GetUIntValue(JObject jo, string strKey, ref ulong ret)
         {
-            if (jo[strKey].Type == JTokenType.String)
+            try
             {
-                ret = Convert.ToUInt64(jo[strKey].ToString());
-                return 0;
+                if (jo[strKey].Type == JTokenType.String)
+                {
+                    ret = Convert.ToUInt64(jo[strKey].ToString());
+                    return 0;
+                }
+                else
+                    return -1;
             }
-            else
+            catch (Exception e)
+            {
+                m_strErrDesc = e.ToString();
                 return -1;
+            }
         }
         private int GetStringValue(JObject jo, string strKey, ref string ret)
         {
-            if (jo[strKey].Type == JTokenType.String)
+            try
             {
-                ret = jo[strKey].ToString();
-                return 0;
+                if (jo[strKey].Type == JTokenType.String)
+                {
+                    ret = jo[strKey].ToString();
+                    return 0;
+                }
+                else
+                    return -1;
             }
-            else
+            catch (Exception e)
+            {
+                m_strErrDesc = e.ToString();
                 return -1;
+            }
         }
 
         private int SendData(byte[] byteBuf, int size, ref JObject jo)
@@ -401,6 +427,7 @@ namespace VodUpload
             request.ContentType = "application/x-www-form-urlencoded";
             request.ContentLength = size;
             request.Timeout = m_iHttpTimeOut;
+            string retString;
             try
             {
                 Stream reqStream = request.GetRequestStream();
@@ -408,18 +435,14 @@ namespace VodUpload
                 HttpWebResponse response = (HttpWebResponse)request.GetResponse();
                 Stream myResponseStream = response.GetResponseStream();
                 StreamReader myStreamReader = new StreamReader(myResponseStream, Encoding.GetEncoding("utf-8"));
-                string retString = myStreamReader.ReadToEnd();
-
-                jo = JObject.Parse(retString);
+                retString = myStreamReader.ReadToEnd();
                 myStreamReader.Close();
                 myResponseStream.Close();
+
+                jo = JObject.Parse(retString);
             }
-            catch (WebException webEx)
+            catch (Exception e)
             {
-                if (webEx.Status == WebExceptionStatus.Timeout)
-                {
-                    return HTTP_TIME_OUT;
-                }
                 return HTTP_CLIENT_ERROR;
             }
 

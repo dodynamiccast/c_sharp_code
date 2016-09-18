@@ -17,6 +17,26 @@ namespace WindowsFormsApplication1
         Thread m_uploadThread;
         long m_qwId;
         private DbManager m_dbManager;
+        public int SetTransCode(int iIsTrans)
+        {
+            m_upload.SetTranscode(iIsTrans);
+            return 0;
+        }
+        public int SetScreenShot(int iIsScreenShot)
+        {
+            m_upload.SetScreenShort(iIsScreenShot);
+            return 0;
+        }
+        public int SetWatermark(int iIsWaterMark)
+        {
+            m_upload.SetWatermark(iIsWaterMark);
+            return 0;
+        }
+        public int SetNotifyUrl(string url)
+        {
+            m_upload.SetNotifyUrl(url);
+            return 0;
+        }
         public int Status
         {
             get { return m_upload.Status; }
@@ -49,7 +69,7 @@ namespace WindowsFormsApplication1
             textBox_path.Text = strFilePath;
             textBox_rate.Text = "0";
             textBox_speed.Text = "0";
-            label_status.Text = "运行中";
+            label_status.Text = "等待中";
             return 0;
         }
        
@@ -77,7 +97,14 @@ namespace WindowsFormsApplication1
                 label_status.Text = "出错";
                 return -1;
             }
-            label_status.Text = "运行中";
+            if (m_upload.Status == MultiPartUpload.FILE_RUNNING)
+            {
+                label_status.Text = "运行中";
+            }
+            if (m_upload.Status == MultiPartUpload.FILE_WAIT)
+            {
+                label_status.Text = "等待中";
+            }
             return 0;
         }
         public int StopThread()
