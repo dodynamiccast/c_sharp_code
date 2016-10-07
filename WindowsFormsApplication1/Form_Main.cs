@@ -203,7 +203,10 @@ namespace WindowsFormsApplication1
         }
         private void but_test_Click(object sender, EventArgs e)
         {
-            string strFilePath = textBox_filePath.Text;
+            DoUpload(textBox_filePath.Text);
+        }
+        private void DoUpload(string strFilePath)
+        { 
             //int index = dataGridView_test.Rows.Add();
             if (textBox_secId.Text == "" || textBox_secKey.Text == "")
             {
@@ -260,9 +263,15 @@ namespace WindowsFormsApplication1
            foreach (UserControl_upload_ex uploadex in m_arrUploadCtrl)
             {
                 int ret = uploadex.Refresh_Upload();
-                if (ret == 0)
+                if (ret == UserControl_upload_ex.REFRESH_RET_RUNNING)
                 {
                     continue;
+                }
+                if (ret == UserControl_upload_ex.REFRESH_RET_CANCLED)
+                {
+                    flowLayoutPanel_contain.Controls.Remove(uploadex);
+                    m_arrUploadCtrl.Remove(uploadex);
+                    break;
                 }
                 TryWakeUp();
             }
@@ -278,10 +287,20 @@ namespace WindowsFormsApplication1
 
         private void button1_Click(object sender, EventArgs e)
         {
+            if (textBox_secId.Text == "" || textBox_secKey.Text == "")
+            {
+                MessageBox.Show("secId/secKey 未填写");
+                return;
+            }
             OpenFileDialog open = new OpenFileDialog();
+            open.Multiselect = true;
             if (open.ShowDialog() == DialogResult.OK)
             {
                 textBox_filePath.Text = open.FileName;
+            }
+            for (int i = 0; i < open.FileNames.Length; i++)
+            {
+                DoUpload(open.FileNames[i]);
             }
         }
 

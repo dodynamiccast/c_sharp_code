@@ -7,6 +7,18 @@ using System.Windows;
 
 namespace VodUpload
 {
+    public class DbLimitDef
+    {
+        public DbLimitDef(string strCol, string strOp, object objVal)
+        {
+            m_strCol = strCol;
+            m_strOp = strOp;
+            m_objVal = objVal;
+        }
+        public string m_strCol;
+        public object m_objVal;
+        public string m_strOp;
+    }
     public class DbManager
     {
         SQLiteConnection m_sqlConn;
@@ -138,21 +150,82 @@ namespace VodUpload
             }
             return 0;
         }
-        public int GetFileInfo(UInt64 qwAppid, ref List<Dictionary<string, string>> arrFile, int status=-1)
+        public int SearchFile(UInt64 qwAppid, ref List<Dictionary<string, string>> arrFile,
+                                ref List<DbLimitDef> arrCond,
+                                int status = -1,
+                                int page_size = -1,
+                                int page_num = 1)
         {
             string[] arrPara = { "id", "appid", "errCode",
                 "filePath", "fileName", "status", "fileId", "errDesc","fileSha",
-                "isScreenshort", "isTranscode", "isWatermark","notifyUrl"};
+                "isScreenshort", "isTranscode", "isWatermark","notifyUrl", "createTime"};
             SQLiteCommand cmd = new SQLiteCommand(m_sqlConn);
-            string cmdText = "select id,appid,errCode,filePath,fileName,status,fileId,errDesc,fileSha,"+
-                "isTranscode,isScreenshort,isWatermark,notifyUrl " +
+            string cmdText = "select id,appid,errCode,filePath,fileName,status,fileId,errDesc,fileSha," +
+                "isTranscode,isScreenshort,isWatermark,notifyUrl,create_time " +
                 "from file where appid=@appid";
             if (status != -1)
             {
                 cmdText += " and status = @status";
                 cmd.Parameters.Add(new SQLiteParameter("@status", status));
             }
+            foreach (DbLimitDef def in arrCond)
+            {
+                cmdText += (" and " + def.m_strCol + def.m_strOp + def.m_objVal);
+            }
             cmdText += " order by create_time desc";
+            if (page_size != -1)
+            {
+                if (page_num != 0)
+                    cmdText += (" limit " + page_size * (page_num - 1) + "," + page_size);
+                else
+                    cmdText += (" limit " + page_size);
+            }
+            cmd.Parameters.Add(new SQLiteParameter("@appid", qwAppid));
+            cmd.CommandText = cmdText;
+            SQLiteDataReader data = cmd.ExecuteReader(System.Data.CommandBehavior.SingleResult);
+            while (data.Read())
+            {
+                int iIndex = 0;
+                Dictionary<string, string> dicPara = new Dictionary<string, string>();
+                for (iIndex = 0; iIndex < arrPara.Length; iIndex++)
+                {
+                    dicPara[arrPara[iIndex]] = data.GetValue(iIndex).ToString();
+                }
+                arrFile.Add(dicPara);
+            }
+            return 0;
+        }
+        public int GetFileInfo(UInt64 qwAppid, ref List<Dictionary<string, string>> arrFile, 
+                                int status=-1, 
+                                int page_size = -1,
+                                int page_num = 1,
+                                long start_id = 0)
+        {
+            string[] arrPara = { "id", "appid", "errCode",
+                "filePath", "fileName", "status", "fileId", "errDesc","fileSha",
+                "isScreenshort", "isTranscode", "isWatermark","notifyUrl", "createTime"};
+            SQLiteCommand cmd = new SQLiteCommand(m_sqlConn);
+            string cmdText = "select id,appid,errCode,filePath,fileName,status,fileId,errDesc,fileSha,"+
+                "isTranscode,isScreenshort,isWatermark,notifyUrl,create_time " +
+                "from file where appid=@appid";
+            if (status != -1)
+            {
+                cmdText += " and status = @status";
+                cmd.Parameters.Add(new SQLiteParameter("@status", status));
+            }
+            if (start_id != 0)
+            {
+                cmdText += " and id < $id ";
+                cmd.Parameters.Add(new SQLiteParameter("@id", start_id));
+            }
+            cmdText += " order by create_time desc";
+            if (page_size != -1)
+            {
+                if (page_num != 0)
+                    cmdText += (" limit " + page_size*(page_num - 1) + "," + page_size);
+                else 
+                    cmdText += (" limit " + page_size);
+            }
             cmd.Parameters.Add(new SQLiteParameter("@appid", qwAppid));
             cmd.CommandText = cmdText;
             SQLiteDataReader data = cmd.ExecuteReader(System.Data.CommandBehavior.SingleResult);

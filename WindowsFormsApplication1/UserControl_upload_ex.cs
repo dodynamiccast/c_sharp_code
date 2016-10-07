@@ -13,10 +13,15 @@ namespace WindowsFormsApplication1
 {
     public partial class UserControl_upload_ex : UserControl
     {
+        public const int REFRESH_RET_FINISH = 1;
+        public const int REFRESH_RET_RUNNING = 0;
+        public const int REFRESH_RET_CANCLED = 2;
+        public const int REFRESH_RET_SVRERROR = 3;
         private MultiPartUpload m_upload;
         Thread m_uploadThread;
         long m_qwId;
         private DbManager m_dbManager;
+        private int m_iIsCancled = 0;
         public int SetTransCode(int iIsTrans)
         {
             m_upload.SetTranscode(iIsTrans);
@@ -81,6 +86,12 @@ namespace WindowsFormsApplication1
         }
         public int Refresh_Upload()
         {
+            if (m_iIsCancled == 1)
+            {
+                m_dbManager.UpdateFileInfo(m_qwId, m_upload.FileId, m_upload.FileSha,
+                    MultiPartUpload.FILE_CANCLED, m_upload.ErrCode, m_upload.ErrDesc);
+                return REFRESH_RET_CANCLED;
+            }
             textBox_rate.Text = Math.Floor((m_upload.UploadRate)*100.0).ToString() + "%";
             textBox_speed.Text = Math.Floor((m_upload.UploadSpeed/1000.0)).ToString() + "KB/s";
             textBox_sha.Text = m_upload.FileSha;
@@ -90,12 +101,12 @@ namespace WindowsFormsApplication1
             {
                 textBox_fileId.Text = m_upload.FileId;
                 label_status.Text = "完成";
-                return 1;
+                return REFRESH_RET_FINISH;
             }
             if (m_upload.Status == MultiPartUpload.FILE_SVR_ERROR)
             {
                 label_status.Text = "出错";
-                return -1;
+                return REFRESH_RET_SVRERROR;
             }
             if (m_upload.Status == MultiPartUpload.FILE_RUNNING)
             {
@@ -105,12 +116,18 @@ namespace WindowsFormsApplication1
             {
                 label_status.Text = "等待中";
             }
-            return 0;
+            return REFRESH_RET_RUNNING;
         }
         public int StopThread()
         {
             m_uploadThread.Abort();
             return 0;
+        }
+
+        private void button_cancle_Click(object sender, EventArgs e)
+        {
+            m_uploadThread.Abort();
+            m_iIsCancled = 1;
         }
     }
 }

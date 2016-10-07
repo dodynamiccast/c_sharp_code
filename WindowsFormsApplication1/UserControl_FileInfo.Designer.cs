@@ -32,46 +32,70 @@
             this.textBox_fileSha = new System.Windows.Forms.TextBox();
             this.textBox_status = new System.Windows.Forms.TextBox();
             this.textBox_errCode = new System.Windows.Forms.TextBox();
+            this.textBox_fileName = new System.Windows.Forms.TextBox();
+            this.textBox_createtime = new System.Windows.Forms.TextBox();
             this.SuspendLayout();
             // 
             // textBox_fileId
             // 
-            this.textBox_fileId.Location = new System.Drawing.Point(4, 4);
+            this.textBox_fileId.Location = new System.Drawing.Point(324, 7);
             this.textBox_fileId.Name = "textBox_fileId";
+            this.textBox_fileId.ReadOnly = true;
             this.textBox_fileId.Size = new System.Drawing.Size(125, 21);
             this.textBox_fileId.TabIndex = 0;
             // 
             // textBox_fileSha
             // 
-            this.textBox_fileSha.Location = new System.Drawing.Point(134, 4);
+            this.textBox_fileSha.Location = new System.Drawing.Point(460, 7);
             this.textBox_fileSha.Name = "textBox_fileSha";
+            this.textBox_fileSha.ReadOnly = true;
             this.textBox_fileSha.Size = new System.Drawing.Size(149, 21);
             this.textBox_fileSha.TabIndex = 1;
             // 
             // textBox_status
             // 
-            this.textBox_status.Location = new System.Drawing.Point(292, 4);
+            this.textBox_status.Location = new System.Drawing.Point(128, 7);
             this.textBox_status.Name = "textBox_status";
+            this.textBox_status.ReadOnly = true;
             this.textBox_status.Size = new System.Drawing.Size(71, 21);
             this.textBox_status.TabIndex = 2;
             // 
             // textBox_errCode
             // 
-            this.textBox_errCode.Location = new System.Drawing.Point(387, 4);
+            this.textBox_errCode.Location = new System.Drawing.Point(210, 7);
             this.textBox_errCode.Name = "textBox_errCode";
+            this.textBox_errCode.ReadOnly = true;
             this.textBox_errCode.Size = new System.Drawing.Size(103, 21);
             this.textBox_errCode.TabIndex = 3;
+            // 
+            // textBox_fileName
+            // 
+            this.textBox_fileName.Location = new System.Drawing.Point(13, 7);
+            this.textBox_fileName.Name = "textBox_fileName";
+            this.textBox_fileName.ReadOnly = true;
+            this.textBox_fileName.Size = new System.Drawing.Size(104, 21);
+            this.textBox_fileName.TabIndex = 4;
+            // 
+            // textBox_createtime
+            // 
+            this.textBox_createtime.Location = new System.Drawing.Point(615, 7);
+            this.textBox_createtime.Name = "textBox_createtime";
+            this.textBox_createtime.ReadOnly = true;
+            this.textBox_createtime.Size = new System.Drawing.Size(136, 21);
+            this.textBox_createtime.TabIndex = 5;
             // 
             // UserControl_FileInfo
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this.textBox_createtime);
+            this.Controls.Add(this.textBox_fileName);
             this.Controls.Add(this.textBox_errCode);
             this.Controls.Add(this.textBox_status);
             this.Controls.Add(this.textBox_fileSha);
             this.Controls.Add(this.textBox_fileId);
             this.Name = "UserControl_FileInfo";
-            this.Size = new System.Drawing.Size(517, 32);
+            this.Size = new System.Drawing.Size(754, 32);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -83,5 +107,7 @@
         private System.Windows.Forms.TextBox textBox_fileSha;
         private System.Windows.Forms.TextBox textBox_status;
         private System.Windows.Forms.TextBox textBox_errCode;
+        private System.Windows.Forms.TextBox textBox_fileName;
+        private System.Windows.Forms.TextBox textBox_createtime;
     }
 }

@@ -37,6 +37,7 @@ namespace VodUpload
         public const int FILE_FINISH = 1;
         public const int FILE_RUNNING = 2;
         public const int FILE_SVR_ERROR = 3;
+        public const int FILE_CANCLED = 4;
         private string m_strSecId;
         private string m_strSecKey;
         private string m_strReqHost;
