@@ -38,7 +38,7 @@
             // 
             // textBox_fileId
             // 
-            this.textBox_fileId.Location = new System.Drawing.Point(324, 7);
+            this.textBox_fileId.Location = new System.Drawing.Point(314, 3);
             this.textBox_fileId.Name = "textBox_fileId";
             this.textBox_fileId.ReadOnly = true;
             this.textBox_fileId.Size = new System.Drawing.Size(125, 21);
@@ -46,7 +46,7 @@
             // 
             // textBox_fileSha
             // 
-            this.textBox_fileSha.Location = new System.Drawing.Point(460, 7);
+            this.textBox_fileSha.Location = new System.Drawing.Point(449, 3);
             this.textBox_fileSha.Name = "textBox_fileSha";
             this.textBox_fileSha.ReadOnly = true;
             this.textBox_fileSha.Size = new System.Drawing.Size(149, 21);
@@ -54,7 +54,7 @@
             // 
             // textBox_status
             // 
-            this.textBox_status.Location = new System.Drawing.Point(128, 7);
+            this.textBox_status.Location = new System.Drawing.Point(120, 3);
             this.textBox_status.Name = "textBox_status";
             this.textBox_status.ReadOnly = true;
             this.textBox_status.Size = new System.Drawing.Size(71, 21);
@@ -62,7 +62,7 @@
             // 
             // textBox_errCode
             // 
-            this.textBox_errCode.Location = new System.Drawing.Point(210, 7);
+            this.textBox_errCode.Location = new System.Drawing.Point(201, 3);
             this.textBox_errCode.Name = "textBox_errCode";
             this.textBox_errCode.ReadOnly = true;
             this.textBox_errCode.Size = new System.Drawing.Size(103, 21);
@@ -70,7 +70,7 @@
             // 
             // textBox_fileName
             // 
-            this.textBox_fileName.Location = new System.Drawing.Point(13, 7);
+            this.textBox_fileName.Location = new System.Drawing.Point(6, 3);
             this.textBox_fileName.Name = "textBox_fileName";
             this.textBox_fileName.ReadOnly = true;
             this.textBox_fileName.Size = new System.Drawing.Size(104, 21);
@@ -78,7 +78,7 @@
             // 
             // textBox_createtime
             // 
-            this.textBox_createtime.Location = new System.Drawing.Point(615, 7);
+            this.textBox_createtime.Location = new System.Drawing.Point(608, 3);
             this.textBox_createtime.Name = "textBox_createtime";
             this.textBox_createtime.ReadOnly = true;
             this.textBox_createtime.Size = new System.Drawing.Size(136, 21);
@@ -95,7 +95,7 @@
             this.Controls.Add(this.textBox_fileSha);
             this.Controls.Add(this.textBox_fileId);
             this.Name = "UserControl_FileInfo";
-            this.Size = new System.Drawing.Size(754, 32);
+            this.Size = new System.Drawing.Size(754, 26);
             this.ResumeLayout(false);
             this.PerformLayout();
 

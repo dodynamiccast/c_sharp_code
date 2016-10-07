@@ -56,7 +56,6 @@ namespace VodUpload
         {
             get { return m_strFileSha; }
         }
-        private string m_strReqUrl;
         private string m_strFileId;
 
         public string FileId

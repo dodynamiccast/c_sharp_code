@@ -66,7 +66,7 @@ namespace WindowsFormsApplication1
             m_upload.Init(strSecId, strSecKey);
             return 0;
         }
-        public int SetFileInfo(string strFilePath, string strFileName)
+        public int SetFileInfo(string strFilePath, string strFileName, long createTime)
         {
             if (m_upload.SetFileInfo(strFilePath, strFileName) < 0)
                 return -1;
@@ -75,6 +75,7 @@ namespace WindowsFormsApplication1
             textBox_rate.Text = "0";
             textBox_speed.Text = "0";
             label_status.Text = "等待中";
+            label_createTime.Text = PubFunc.ConvertIntDateTime(createTime).ToString();
             return 0;
         }
        

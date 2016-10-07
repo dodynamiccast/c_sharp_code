@@ -114,6 +114,7 @@
     <Compile Include="MultiPartUpload.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="PubFunc.cs" />
     <Compile Include="UserControl_FileInfo.cs">
       <SubType>UserControl</SubType>
     </Compile>

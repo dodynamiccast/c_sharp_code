@@ -20,8 +20,6 @@ namespace WindowsFormsApplication1
         List<UserControl_upload_ex> m_arrUploadCtrl;
         DbManager m_dbManager;
         string m_strAppId;
-        string m_strSecId;
-        string m_strSecKey;
         public const int MAX_RUNNING_TASK = 6;
         string m_strNotifyUrl = "";
         class TransPara{
@@ -29,6 +27,7 @@ namespace WindowsFormsApplication1
             private int isScreenshort;
             private int isWatermark;
             private string notifyUrl;
+            public long createTime = 0;
 
             public int IsTranscode
             {
@@ -135,6 +134,7 @@ namespace WindowsFormsApplication1
                 para.IsTranscode = GetDicIntVal(file, "isTranscode");
                 para.IsScreenshort = GetDicIntVal(file, "isScreenshort");
                 para.IsWatermark = GetDicIntVal(file, "isWatermark");
+                para.createTime = GetDicIntVal(file, "createTime");
                 para.NotifyUrl = file["notifyUrl"];
                 UploadFile(file["filePath"], file["fileName"], para, long.Parse(file["id"]));
             }
@@ -167,7 +167,7 @@ namespace WindowsFormsApplication1
             //upload.Init("AKIDywHSpWDragT7ESvCtqUrEg8Weuz8ibWj", "wLuplid8L7LsgENlaB2FtyKgUaYsBuqR");
             upload.Init(textBox_secId.Text, textBox_secKey.Text);
             //upload.SetFileInfo("J:\\download\\太子妃升职记.全集.EP01-36.2015.HD1080P.X264.AAC.Mandarin.CHS.Mp4Ba\\太子妃升职记.EP01.2015.HD1080P.X264.AAC.Mandarin.CHS.mp4", "little_prince");
-            if (upload.SetFileInfo(strFilePath, strFileName) < 0)
+            if (upload.SetFileInfo(strFilePath, strFileName, para.createTime) < 0)
             {
                 return -1;
             }
@@ -238,6 +238,7 @@ namespace WindowsFormsApplication1
             if (checkBox_isWm.Checked)
                 para.IsWatermark = 1;
             para.NotifyUrl = m_strNotifyUrl;
+            para.createTime = PubFunc.ConvertDateTimeInt(DateTime.Now);
             UploadFile(strFilePath, strFileName, para);
             //Thread.Sleep(5000);
             //m_upload.Test = "fuck";

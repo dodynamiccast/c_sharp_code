@@ -91,7 +91,7 @@
             this.flowLayoutPanel_contain.AutoScroll = true;
             this.flowLayoutPanel_contain.Location = new System.Drawing.Point(14, 29);
             this.flowLayoutPanel_contain.Name = "flowLayoutPanel_contain";
-            this.flowLayoutPanel_contain.Size = new System.Drawing.Size(779, 368);
+            this.flowLayoutPanel_contain.Size = new System.Drawing.Size(853, 512);
             this.flowLayoutPanel_contain.TabIndex = 4;
             // 
             // label3
@@ -162,7 +162,9 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(805, 409);
+            this.AutoScroll = true;
+            this.AutoSize = true;
+            this.ClientSize = new System.Drawing.Size(879, 553);
             this.Controls.Add(this.dateTimePicker_end);
             this.Controls.Add(this.dateTimePicker_begin);
             this.Controls.Add(this.button_search);

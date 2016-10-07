@@ -11,18 +11,12 @@ namespace VodUpload
 {
     public partial class Form_FileInfo : Form
     {
-        public const int PAGE_SIZE = 5;
+        public const int PAGE_SIZE = 15;
         DbManager m_dbManager;
         int m_dwFileStatus;
         int m_dwPage = 1;
-        long m_lastId;
         ulong m_qwAppId;
         List<DbLimitDef> m_arrLim = new List<DbLimitDef>();
-        public static long ConvertDateTimeInt(System.DateTime time)
-        {
-            System.DateTime startTime = TimeZone.CurrentTimeZone.ToLocalTime(new System.DateTime(1970, 1, 1));
-            return (long)(time - startTime).TotalSeconds;
-        }
         private int LoadFile()
         {
             List<Dictionary<string, string>> arrFile = new List<Dictionary<string, string>>();
@@ -108,8 +102,8 @@ namespace VodUpload
         private void button_search_Click(object sender, EventArgs e)
         {
             m_arrLim.Clear();
-            long timeBegin = ConvertDateTimeInt(dateTimePicker_begin.Value);
-            long timeEnd = ConvertDateTimeInt(dateTimePicker_end.Value);
+            long timeBegin = PubFunc.ConvertDateTimeInt(dateTimePicker_begin.Value);
+            long timeEnd = PubFunc.ConvertDateTimeInt(dateTimePicker_end.Value);
             if (timeEnd > timeBegin)
             {
                 m_arrLim.Add(new DbLimitDef("create_time", ">=", timeBegin));
