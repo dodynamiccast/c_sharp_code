@@ -35,7 +35,6 @@
             // flowLayoutPanel_contain
             // 
             this.flowLayoutPanel_contain.AutoScroll = true;
-            this.flowLayoutPanel_contain.AutoSize = true;
             this.flowLayoutPanel_contain.Location = new System.Drawing.Point(12, 12);
             this.flowLayoutPanel_contain.Name = "flowLayoutPanel_contain";
             this.flowLayoutPanel_contain.Size = new System.Drawing.Size(868, 394);
@@ -51,7 +50,6 @@
             this.Name = "Form_UserManager";
             this.Text = "Form_UserManager";
             this.ResumeLayout(false);
-            this.PerformLayout();
 
         }
 
